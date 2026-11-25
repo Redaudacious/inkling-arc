@@ -11,9 +11,9 @@ VLLM_COMMIT=edd722c73517b43680483187afca93fb6ab41958
 mkdir -p "$W" "$W/tmp"
 export TMPDIR=$W/tmp   # big layers; a 12 GB /tmp tmpfs is not enough
 export MAX_JOBS=${MAX_JOBS:-6}
-[ -d "$W/kit" ] || git clone -q --branch "$KIT_TAG" --depth 1 https://github.com/Lumnus/b70-flash-next "$W/kit"
+[ -d "$W/kit" ] || git clone -q --branch "$KIT_TAG" --depth 1 https://github.com/Redaudacious/b70-flash-next "$W/kit"
 if [ ! -d "$W/vllm" ]; then
-  git init -q "$W/vllm" && git -C "$W/vllm" fetch -q --depth 1 https://github.com/F3zz1k/vllm "$VLLM_COMMIT" && git -C "$W/vllm" checkout -q FETCH_HEAD
+  git init -q "$W/vllm" && git -C "$W/vllm" fetch -q --depth 1 https://github.com/Redaudacious/vllm "$VLLM_COMMIT" && git -C "$W/vllm" checkout -q FETCH_HEAD
 fi
 export KIT=$W/kit
 cd "$W/vllm"

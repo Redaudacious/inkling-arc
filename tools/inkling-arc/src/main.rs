@@ -57,7 +57,7 @@ fn render_node() -> Option<String> {
         let pci = name.trim_start_matches("pci-").trim_end_matches("-render");
         let vendor = fs::read_to_string(format!("/sys/bus/pci/devices/{pci}/vendor")).unwrap_or_default();
         let device = fs::read_to_string(format!("/sys/bus/pci/devices/{pci}/device")).unwrap_or_default();
-        if vendor.trim() == "0x8086" && (device.trim() == "0xe223" || env::var("INKLING_ARC_ANY_INTEL").is_ok()) {
+        if vendor.trim() == "0x8086" && (device.trim() == "0xe223" || device.trim() == "0xe222" || env::var("INKLING_ARC_ANY_INTEL").is_ok()) {
             found = Some(format!("/dev/dri/by-path/{name}"));
         }
     }
