@@ -1,0 +1,11 @@
+[package]
+name = "inkling-arc"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Inkling 2 Mini on one Intel Arc Pro B70: build, fetch, pack, serve, test, bench"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3

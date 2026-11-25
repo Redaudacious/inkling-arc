@@ -1,0 +1,14 @@
+#!/bin/sh
+# inkling-arc bootstrap: builds the Rust CLI (tools/inkling-arc) in a Rust container on first use, then runs it.
+#   git clone <repo> && cd inkling-arc && ./inkling-arc install
+set -eu
+ROOT=$(cd "$(dirname "$0")" && pwd)
+BIN=$ROOT/build/rust/release/inkling-arc
+if command -v podman >/dev/null 2>&1; then E=podman; elif command -v docker >/dev/null 2>&1; then E=docker; else
+  echo "inkling-arc: needs podman or docker" >&2; exit 1; fi
+if [ ! -x "$BIN" ] || [ "$ROOT/tools/inkling-arc/src/main.rs" -nt "$BIN" ]; then
+  echo "== building the inkling-arc CLI (Rust, static)"
+  $E run --rm -v "$ROOT:/work" -w /work docker.io/library/rust:1-alpine sh -c \
+    "cargo build --release --quiet --manifest-path tools/inkling-arc/Cargo.toml --target-dir build/rust"
+fi
+INKLING_ARC_ROOT=$ROOT exec "$BIN" "$@"

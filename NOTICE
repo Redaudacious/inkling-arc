@@ -1,0 +1,51 @@
+inkling-arc
+Copyright 2026 arcitech-psp
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+Most of this code was written with Anthropic's Claude models.
+
+This work builds on, and credits:
+
+1. Inkling 2 Mini, Thinking Machines - Apache-2.0
+   https://huggingface.co/thinkingmachines/Inkling-2-Mini
+   The checkpoint is downloaded at install time; it is not part of this repository.
+
+2. vLLM, the vLLM project - Apache-2.0
+   https://github.com/vllm-project/vllm
+   The files under engine/overlay/vllm are changed copies of vLLM files as found in item 3. Each changed file says so in
+   its header ("Changed by inkling-arc").
+
+3. F3zz1k/vllm, branch inkling2-b70, commit edd722c73517b43680483187afca93fb6ab41958 - Apache-2.0
+   https://github.com/F3zz1k/vllm
+   The Inkling 2 XPU port this project extends. Fetched by image/build-base-image.sh; not stored here.
+
+4. Lumnus/b70-flash-next, tag v0.32.0-b70.7 - Apache-2.0
+   https://github.com/Lumnus/b70-flash-next
+   The B70 vLLM-XPU kit the base image is built with. Fetched by image/build-base-image.sh; not stored here.
+   Its NOTICE lists MIT material by wu1ff (https://github.com/wu1ff/B70-LLM-Controller), including the Level Zero
+   residency shim the serving image preloads.
+
+5. vLLM pull request #69186 by mgaruccio - Apache-2.0
+   torch.mm(out_dtype=float32) on XPU for the fp32 LM head (engine/overlay/vllm/model_executor/layers/logits_processor.py).
+
+6. SergiioB/intel-arc-pro-b70-inference-cookbook - MIT, Copyright (c) 2026 SergiioB
+   https://github.com/SergiioB/intel-arc-pro-b70-inference-cookbook
+   kernels/attention/kvq_decode_xe2.cpp is ported from its patches/inkling2-mini-vllm-xpu/attn_esimd_xe2.cpp.
+   Licence text: licenses/SergiioB-intel-arc-pro-b70-inference-cookbook.MIT.txt
+
+7. Danmoreng/intel-b70-inkling2-mini-vllm - MIT, Copyright (c) 2026 The project contributors
+   https://github.com/Danmoreng/intel-b70-inkling2-mini-vllm
+   The hybrid prefill (biased near band + fused attention for far keys) and oneDNN Graph attention with statistics.
+   Licence text: licenses/Danmoreng-intel-b70-inkling2-mini-vllm.MIT.txt
+
+8. oneDNN, UXL Foundation - Apache-2.0
+   https://github.com/uxlfoundation/oneDNN
+   Built from source (v3.14.2) by kernels/build-all.sh; not stored here.
+
+9. Intel oneAPI DPC++/C++ Compiler - installed in the builder image from Intel's apt repository under Intel's licence;
+   not stored here.
+
+10. DavidAU/Inkling-2-Mini-26B-Heretic-Uncensored-Turbo-Brilliance-50X-V2-AGI - Apache-2.0
+    https://huggingface.co/DavidAU/Inkling-2-Mini-26B-Heretic-Uncensored-Turbo-Brilliance-50X-V2-AGI
+    The optional heretic checkpoint (arcitech-psp/Inkling-2-Mini-Heretic-NVFP4-XPU) is this fine-tune converted with
+    tools/inkconv. DavidAU credits yanauto/Inkling-2-Mini-heretic-full for the abliteration.

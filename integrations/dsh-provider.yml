@@ -1,0 +1,32 @@
+# inkling-arc as a DSH provider (merge under `providers:` in your profile's providers file).
+# Server: `./inkling-arc serve multi` (4 chats x 131,072 tokens) or `serve single` (1 chat x 524,288 tokens; set the window below).
+# Inkling facts that matter to a harness:
+#   - reasoning is set by `reasoning_effort` (none / minimal / low / medium / high / xhigh); the chat template ignores enable_thinking
+#     and reasoning cannot be fully disabled (model card). medium is the measured default for agent work.
+#   - sampling from Thinking Machines: temperature 1.0, top_p 1.0, no top_k, min_p 0. Lower temperatures make the re-check loops
+#     the model card warns about more likely.
+#   - tool calls use the `inkling` parser (enabled in the server); images are accepted (vision tower on the GPU).
+inkling-arc:
+  displayName: "Inkling 2 Mini on Intel Arc B70 (inkling-arc)"
+  api: openai-completions
+  baseURL: http://127.0.0.1:8000/v1
+  apiKeyEnv: INKLING_ARC_API_KEY        # any value; the local server does not check it
+  streamIdleTimeoutMs: 900000           # a request queued behind 4 busy seats streams nothing until it starts
+  timeoutMs: 1800000
+  defaultContextWindow: 131072          # 524288 with `serve single`
+  defaultInput: [ text, image ]
+  reasoning: medium
+  cacheRetention: long                  # prefix caching is on: repeated agent prompts start in well under a second
+  compat:
+    supportsStore: false
+    supportsDeveloperRole: false
+    supportsReasoningEffort: true
+    supportsUsageInStreaming: true
+    supportsFinishReason: true
+    maxTokensField: max_tokens
+  sampling:
+    temperature: 1.0
+    top_p: 1.0
+  models:
+    - id: inkling-2-mini
+      contextWindow: 131072

@@ -1,0 +1,21 @@
+# inkling-arc serving image: the vLLM-XPU Inkling 2 base (F3zz1k/vllm inkling2-b70 @ edd722c on Lumnus/b70-flash-next v0.32.0-b70.7)
+# + our engine overlay + our B70 kernels. Weights are not in the image: the checkpoint and the packs are mounted at run time.
+ARG BASE=localhost/vllm-xpu:b70-inkling2
+FROM ${BASE}
+COPY engine/overlay/vllm/ /workspace/vllm/vllm/
+COPY build/lib_nvf4_op.so build/lib_dense_op.so build/_kvq_decode_xe2.cpython-312-x86_64-linux-gnu.so build/libdnnl.so.3 /opt/nvf4/
+COPY build/libnvf4c.so /opt/nvf4/
+COPY build/rust/release/nvf4 /usr/local/bin/nvf4
+# Level Zero / NEO settings the B70 kit runs with, then the engine choices (all measured; see docs/)
+ENV LD_PRELOAD=/opt/b70/libl0_owner_residency.so ZE_ENABLE_TRACING_LAYER=1 UR_L0_V2_FORCE_DISABLE_COPY_OFFLOAD=1 \
+    VLLM_USE_V2_MODEL_RUNNER=1 ZE_AFFINITY_MASK=0 NEOReadDebugKeys=1 ClDeviceGlobalMemSizeAvailablePercent=100 \
+    EnableDeferBacking=1 DeferBackingMemoryPressurePercent=0 ExperimentalCopyThroughLock=0 \
+    ExperimentalH2DCpuCopyThreshold=0 ExperimentalD2HCpuCopyThreshold=0 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+    VLLM_INKLING2_EXPERTS=dpas VLLM_INKLING2_PACKS=/packs VLLM_NVF4_LIB=/opt/nvf4/lib_nvf4_op.so VLLM_INKLING2_MXFP8=bf16 \
+    VLLM_INKLING2_DENSE=int8 VLLM_INKLING2_HEAD=int8 VLLM_INKLING2_KV=k8v4 VLLM_INKLING2_DRAFT_WINDOW=1024 \
+    VLLM_INKLING2_WO=dpas VLLM_INKLING2_VERIFY_PACK=1 VLLM_INKLING2_TRITON_SPLITS_GLOBAL=32 VLLM_INKLING2_LOOKUP_CHAIN=1 \
+    VLLM_INKLING2_ESIMD_GLOBAL=1 VLLM_INKLING2_ESIMD_FAR=1 VLLM_KVQ_EXT_DIR=/opt/nvf4 NVF4_LIB=/opt/nvf4/libnvf4c.so
+# client stop words act only in answer text, never inside reasoning or a tool call (engine/overlay/vllm/v1/engine/detokenizer.py)
+ENV VLLM_STOP_GATE="arm=<|content_text|>;disarm=<|content_thinking|>,<|content_invoke_tool_json|>,<|content_invoke_tool_text|>,<|content_xml|>,<|content_image|>,<|content_tool_error|>,<|content_model_end_sampling|>,<|end_message|>,<|message_model|>,<|message_user|>,<|message_system|>,<|message_tool|>"
+LABEL org.opencontainers.image.title="inkling-arc" org.opencontainers.image.licenses="Apache-2.0"
+ENTRYPOINT ["vllm"]

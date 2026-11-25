@@ -1,0 +1,8 @@
+[package]
+name = "inkeval"
+version = "0.1.0"
+edition = "2021"
+description = "Quality eval for an OpenAI-compatible chat server: instruction, math, reasoning, tools, long context, Rust coding (compiled and tested), vision. No dependencies."
+
+[profile.release]
+opt-level = 3
